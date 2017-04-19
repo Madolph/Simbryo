@@ -175,9 +175,9 @@ public class SynthoscopySandBox
 
           if (lWriteFile)
           {
-            File lRawFile =
-                          new File(lDesktopFolder,
-                                   String.format("file%d.raw", i++)); // lDrosophila.getTimeStepIndex()
+            File lRawFile = new File(lDesktopFolder,
+                                     String.format("output%d.raw",
+                                                   i++)); // lDrosophila.getTimeStepIndex()
 
             System.out.println("Writting: " + lRawFile);
             lRawWriter.write(lSimulator.getCameraImage(0), lRawFile);
@@ -354,7 +354,7 @@ public class SynthoscopySandBox
           {
             File lRawFile =
                           new File(lDesktopFolder,
-                                   String.format("file_%01d_%01d_%04d.raw",
+                                   String.format("plane_%01d_%01d_%04d.raw",
                                                  side,
                                                  (angle < 0) ? 0 : 1,
                                                  counter++)); // lDrosophila.getTimeStepIndex()
