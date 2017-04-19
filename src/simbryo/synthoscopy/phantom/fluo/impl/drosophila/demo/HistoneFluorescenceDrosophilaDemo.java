@@ -80,7 +80,7 @@ public class HistoneFluorescenceDrosophilaDemo
       ClearCLImageViewer lOpenViewer = lDrosoFluo.openViewer();
       Slider lZSlider = lOpenViewer.getZSlider();
 
-      lDrosophila.simulationSteps(cStartSimulationStep, 1);
+      lDrosophila.simulationSteps(cStartSimulationStep);
 
       Timming lTimming = new Timming();
 
@@ -93,7 +93,7 @@ public class HistoneFluorescenceDrosophilaDemo
 
         ElapsedTime.measure(i % cDisplayPeriod == 0,
                             "dynamics",
-                            () -> lDrosophila.simulationSteps(1, 1));
+                            () -> lDrosophila.simulationSteps(1));
 
         if (i % cDisplayPeriod == 0)
         {

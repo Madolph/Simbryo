@@ -32,7 +32,7 @@ public class EmbryoDynamicsTests
 
     int lNumberOfSteps = 7000;
 
-    lDrosophila.simulationSteps(7000, 1);
+    lDrosophila.simulationSteps(7000);
 
     File lTempFile = File.createTempFile("EmbryoDynamicsTests",
                                          "testSerialization");

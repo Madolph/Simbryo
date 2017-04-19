@@ -3,8 +3,8 @@
 #include [OCLlib] "noise/noise.cl"
           
                                 
-__kernel void upscale(     __read_only    image2d_t  imagein,
-                           __write_only   image2d_t  imageout,
+__kernel void upscale(     __read_only    image2d_t    imagein,
+                           __write_only   image2d_t    imageout,
                            const          float        nxmin,
                            const          float        nxscale,
                            const          float        nymin,
@@ -34,6 +34,7 @@ __kernel void camnoise(   __read_only    image2d_t  imagein,
                           __write_only   image2d_t  imageout,
                           __global       ushort*    bufferout,
                           const          int        timeindex,
+                          const          float      exposure,
                           const          float      shotnoise,
                           const          float      offset,
                           const          float      gain,
@@ -65,7 +66,7 @@ __kernel void camnoise(   __read_only    image2d_t  imagein,
   const float noisexyt2f = rngfloat(noisexyt2);
   const float noisexyt3f = rngfloat(noisexyt3);
   
-  const float fluovalue        = read_imagef(imagein, intsampler, (int2){x,y}).x;
+  const float fluovalue        = exposure*read_imagef(imagein, intsampler, (int2){x,y}).x;
   
   const float shotnoisevalue   = shotnoise*native_sqrt(fluovalue)*clampedcauchy(noisexyt1f,9);
   

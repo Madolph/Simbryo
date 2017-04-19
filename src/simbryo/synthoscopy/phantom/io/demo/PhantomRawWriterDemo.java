@@ -81,7 +81,7 @@ public class PhantomRawWriterDemo
       int lEnd = 15000;
 
       // move forward in simulation:
-      lDrosophila.simulationSteps(lStart, 1);
+      lDrosophila.simulationSteps(lStart);
 
       // ClearCLImageViewer lOpenViewer = lDrosoFluo.openViewer();
 
@@ -89,7 +89,7 @@ public class PhantomRawWriterDemo
 
       while (lDrosophila.getTimeStepIndex() < lEnd)
       {
-        lDrosophila.simulationSteps(lPeriod, 1);
+        lDrosophila.simulationSteps(lPeriod);
         long lTimeIndex = lDrosophila.getTimeStepIndex();
 
         lDrosoFluo.clear(true);

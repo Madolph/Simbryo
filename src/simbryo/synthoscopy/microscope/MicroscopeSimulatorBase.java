@@ -1,9 +1,11 @@
 package simbryo.synthoscopy.microscope;
 
+import java.util.ArrayList;
 import java.util.concurrent.ConcurrentHashMap;
 
 import clearcl.ClearCLContext;
 import clearcl.ClearCLImage;
+import simbryo.synthoscopy.microscope.aberration.AberrationInterface;
 import simbryo.synthoscopy.microscope.parameters.ParameterInterface;
 import simbryo.synthoscopy.phantom.PhantomRendererUtils;
 
@@ -21,11 +23,16 @@ public abstract class MicroscopeSimulatorBase implements
 
   protected long[] mMainPhantomDimensions;
 
+  private volatile int mTimeStepIndex = 0;
+
   protected ConcurrentHashMap<ParameterInterface<Void>, ClearCLImage> mPhantomMap =
                                                                                   new ConcurrentHashMap<>();
 
   protected ConcurrentHashMap<ParameterInterface<Number>, ConcurrentHashMap<Integer, Number>> mParametersMap =
                                                                                                              new ConcurrentHashMap<>();
+
+  protected ArrayList<AberrationInterface> mListOfAbberations =
+                                                              new ArrayList<>();
 
   /**
    * Instanciates a microscope simulator.
@@ -43,6 +50,36 @@ public abstract class MicroscopeSimulatorBase implements
     mMainPhantomDimensions =
                            PhantomRendererUtils.adaptImageDimensionsToDevice(pContext.getDevice(),
                                                                              pMainPhantomDimensions);
+  }
+
+  /**
+   * Adds abberations to this microscope
+   * 
+   * @param pAberrations
+   *          vararg list of abberations
+   */
+  public void addAbberation(AberrationInterface... pAberrations)
+  {
+    for (AberrationInterface lAberration : pAberrations)
+    {
+      lAberration.setMicroscope(this);
+      mListOfAbberations.add(lAberration);
+    }
+  }
+
+  @Override
+  public void simulationSteps(int pNumberOfSteps)
+  {
+    for (AberrationInterface lAberration : mListOfAbberations)
+      lAberration.simulationSteps(pNumberOfSteps);
+
+    mTimeStepIndex += pNumberOfSteps;
+  }
+
+  @Override
+  public long getTimeStepIndex()
+  {
+    return mTimeStepIndex;
   }
 
   /**
@@ -153,6 +190,15 @@ public abstract class MicroscopeSimulatorBase implements
     return lNumber;
   }
 
+  @Override
+  public Number getNumberParameterWithAberrations(ParameterInterface<Number> pParameter,
+                                                  int pIndex)
+  {
+    Number lNumber = getNumberParameter(pParameter, pIndex);
+
+    return abberation(pParameter, pIndex, lNumber);
+  }
+
   /**
    * Returns value for a given parameter and index. If the parameter is not
    * defined, a overriding default value is given which is used instead of the
@@ -180,6 +226,30 @@ public abstract class MicroscopeSimulatorBase implements
 
     if (lNumber == null)
       return pDefaultOverideValue;
+    return lNumber;
+  }
+
+  @Override
+  public Number getNumberParameterWithAberrations(ParameterInterface<Number> pParameter,
+                                                  int pIndex,
+                                                  Number pDefaultOverideValue)
+  {
+    Number lNumber = getNumberParameter(pParameter,
+                                        pIndex,
+                                        pDefaultOverideValue);
+
+    return abberation(pParameter, pIndex, lNumber);
+  }
+
+  private Number abberation(ParameterInterface<Number> pParameter,
+                            int pIndex,
+                            Number pNumber)
+  {
+    Number lNumber = pNumber;
+    for (AberrationInterface lAbberation : mListOfAbberations)
+    {
+      lNumber = lAbberation.transform(pParameter, pIndex, lNumber);
+    }
     return lNumber;
   }
 

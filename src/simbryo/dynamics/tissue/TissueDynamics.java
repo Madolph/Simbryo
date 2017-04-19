@@ -10,7 +10,6 @@ import simbryo.particles.forcefield.interaction.impl.CollisionForceField;
 import simbryo.particles.viewer.ParticleViewerInterface;
 import simbryo.particles.viewer.three.ParticleViewer3D;
 import simbryo.util.DoubleBufferingFloatArray;
-import simbryo.util.sequence.Sequence;
 
 /**
  * Tissue dynamics extend from a particle system with standard dynamics
@@ -44,7 +43,7 @@ public class TissueDynamics extends ParticleSystem
                                                       new ArrayList<>();
 
   protected volatile long mTimeStepIndex = 0;
-  protected final Sequence mSequence = new Sequence();
+  // protected final Sequence mSequence = new Sequence();
 
   private transient ParticleViewer3D mParticleViewer3D;
 
@@ -158,10 +157,9 @@ public class TissueDynamics extends ParticleSystem
    * 
    * @param pNumberOfSteps
    *          number of simulation steps.
-   * @param pDeltaTime
-   *          delta time for each step.
    */
-  public void simulationSteps(int pNumberOfSteps, float pDeltaTime)
+  @Override
+  public void simulationSteps(int pNumberOfSteps)
   {
     for (int i = 0; i < pNumberOfSteps; i++)
     {
@@ -172,7 +170,7 @@ public class TissueDynamics extends ParticleSystem
       enforceBounds(Db);
       updateNeighborhoodGrid();
       mTimeStepIndex++;
-      mSequence.step(pDeltaTime);
+      // mSequence.step(pDeltaTime);
     }
 
     if (mParticleViewer3D != null)

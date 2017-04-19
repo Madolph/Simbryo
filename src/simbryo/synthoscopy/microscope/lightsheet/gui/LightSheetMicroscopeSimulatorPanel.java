@@ -1,4 +1,4 @@
-package simbryo.synthoscopy.microscope.lightsheet.gui.jfx;
+package simbryo.synthoscopy.microscope.lightsheet.gui;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -151,7 +151,7 @@ public class LightSheetMicroscopeSimulatorPanel extends TabPane
     Slider lSlider = new Slider(lMinValue, lMaxValue, lDefaultValue);
 
     lSlider.setShowTickLabels(true);
-    lSlider.setShowTickMarks(true);
+    lSlider.setShowTickMarks(false);
     lSlider.setBlockIncrement((lMaxValue - lMinValue) / 1000);
     lSlider.setMajorTickUnit((lMaxValue - lMinValue) / 10);
     lSlider.setMinorTickCount(10);

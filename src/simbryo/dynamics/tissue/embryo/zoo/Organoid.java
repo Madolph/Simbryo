@@ -54,7 +54,7 @@ public class Organoid extends EmbryoDynamics
   }
 
   @Override
-  public void simulationSteps(int pNumberOfSteps, float pDeltaTime)
+  public void simulationSteps(int pNumberOfSteps)
   {
     for (int i = 0; i < pNumberOfSteps; i++)
     {
@@ -62,7 +62,7 @@ public class Organoid extends EmbryoDynamics
         triggerCellDivision();
 
       applyForceField(mCentriForceField);
-      super.simulationSteps(1, pDeltaTime);
+      super.simulationSteps(1);
     }
   }
 

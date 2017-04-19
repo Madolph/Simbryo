@@ -17,6 +17,11 @@ public abstract class ClearCLCameraRendererBase extends
                                                 CameraRendererInterface<ClearCLImage>
 
 {
+  /**
+   * normal camera exposure
+   */
+  public static final float cNormalExposure = 0.020f;
+
   protected ClearCLImage mDetectionImage;
 
   protected Vector3f mDetectionDownUpVector = new Vector3f();

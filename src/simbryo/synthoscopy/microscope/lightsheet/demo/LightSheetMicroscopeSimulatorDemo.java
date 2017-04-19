@@ -62,6 +62,20 @@ public class LightSheetMicroscopeSimulatorDemo
    *           NA
    */
   @Test
+  public void demo1D4I() throws IOException, InterruptedException
+  {
+    test(1, 4);
+  }
+
+  /**
+   * Demo
+   * 
+   * @throws IOException
+   *           NA
+   * @throws InterruptedException
+   *           NA
+   */
+  @Test
   public void demo2D1I() throws IOException, InterruptedException
   {
     test(2, 1);

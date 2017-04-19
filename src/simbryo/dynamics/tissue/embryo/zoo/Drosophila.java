@@ -214,7 +214,7 @@ public class Drosophila extends EmbryoDynamics
   }
 
   @Override
-  public void simulationSteps(int pNumberOfSteps, float pDeltaTime)
+  public void simulationSteps(int pNumberOfSteps)
   {
     for (int i = 0; i < pNumberOfSteps; i++)
     {
@@ -226,7 +226,7 @@ public class Drosophila extends EmbryoDynamics
       applyForceField(mOutsideEllipseForceField);
       applyForceField(mInsideEllipseForceField);
 
-      super.simulationSteps(1, pDeltaTime);
+      super.simulationSteps(1);
     }
   }
 
@@ -289,7 +289,7 @@ public class Drosophila extends EmbryoDynamics
     {
 
       lDrosophila = new Drosophila(64, 16, 16, 16);
-      lDrosophila.simulationSteps((int) (pDivisionTime * 1000), 1);
+      lDrosophila.simulationSteps((int) (pDivisionTime * 1000));
       SerializationUtilities.saveToFile(lDrosophila,
                                         lCachedEmbryoDynamicsFile);
     }

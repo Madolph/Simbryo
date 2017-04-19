@@ -36,7 +36,6 @@ inline float lightsheetfun( const float lambda,
                                 
 __kernel void propagate(   __read_only    image3d_t  scatterphantom,
                            __constant     float*     matrix,
-                           __read_only    image3d_t  lightmapin,
                            __write_only   image3d_t  lightmapout,
                            __read_only    image2d_t  binput,
                            __write_only   image2d_t  boutput,
@@ -73,8 +72,6 @@ __kernel void propagate(   __read_only    image3d_t  scatterphantom,
   const int lmdepth  = get_image_depth(lightmapout);
   const float4 lmdim = (float4){(float)lmwidth,(float)lmheight,(float)lmdepth, 1.0f};
   const float4 ilmdim = 1.0f/lmdim;
-  
-  const bool hasinput = get_image_width(lightmapin)!=1;
  
   const int smwidth  = get_image_width(scatterphantom);
   const int smheight = get_image_height(scatterphantom);
@@ -112,7 +109,7 @@ __kernel void propagate(   __read_only    image3d_t  scatterphantom,
   const float ballistic0 =  lightsheetfun(lambda, intensity, w0, lsheight, lsp, lsa, lsn, pos);
   
   // [READ IMAGE] proportion of ballistic light that made it through in previous planes:
-  const float oldballisticratio =  read_imagef(binput, normsamplerclamp, dvec+halfshift+(float2){y,z}*ilmdim.yz).x;
+  const float oldballisticratio =  read_imagef(binput, normsamplerclampedge, dvec+halfshift+(float2){y,z}*ilmdim.yz).x;
  
   // scattering map value at voxel: 
   const float scattermapvalue = trans_read_imagef(scatterphantom, normsamplerclampedge, matrix16, pos).x;
@@ -165,14 +162,8 @@ __kernel void propagate(   __read_only    image3d_t  scatterphantom,
   // which voxel to read/write to:
   const int4 voxelcoord = (int4){x,y,z,0};
 
-  // [READ IMAGE] Read existing value:
-  const float lightin = hasinput?(read_imagef(lightmapin, intsampler, voxelcoord)).x:0.0f;
-   
-  // adding the new light to possibly existing light. 
-  const float lightout = lightin+light;
-
   // [WRITE IMAGE] Write lightmap value:
-  write_imagef(lightmapout, voxelcoord, lightout); 
+  write_imagef(lightmapout, voxelcoord, light); 
 
 }
 

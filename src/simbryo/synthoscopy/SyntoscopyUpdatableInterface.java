@@ -28,10 +28,11 @@ public interface SyntoscopyUpdatableInterface
   boolean isUpdateNeeded();
 
   /**
-   * Adds an update listener. Update requests will be forwarded to this
+   * Adds an update listener. Update notifications will be forwarded to the
+   * given listener
    * 
    * @param pUpdateListener
-   *          update listener
+   *          update listener to forward notifications to
    */
   void addUpdateListener(SyntoscopyUpdatableInterface pUpdateListener);
 

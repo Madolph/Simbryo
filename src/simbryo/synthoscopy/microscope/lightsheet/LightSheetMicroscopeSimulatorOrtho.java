@@ -1,5 +1,11 @@
 package simbryo.synthoscopy.microscope.lightsheet;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+import static java.lang.Math.toRadians;
+
+import java.io.IOException;
+
 import javax.vecmath.Matrix4f;
 import javax.vecmath.Vector3f;
 
@@ -43,7 +49,7 @@ public class LightSheetMicroscopeSimulatorOrtho extends
     if (pMainPhantomDimensions.length != 3)
       throw new IllegalArgumentException("Phantom dimensions must have 3 components: (width,height,depth).");
 
-    if (pNumberOfIlluminationArms >= 1)
+    if (pNumberOfIlluminationArms == 1)
     {
       Vector3f lIlluminationAxisVector = new Vector3f(1, 0, 0);
       Vector3f lIlluminationNormalVector = new Vector3f(0, 0, 1);
@@ -51,14 +57,45 @@ public class LightSheetMicroscopeSimulatorOrtho extends
       addLightSheet(lIlluminationAxisVector,
                     lIlluminationNormalVector);
     }
-
-    if (pNumberOfIlluminationArms >= 2)
+    else if (pNumberOfIlluminationArms == 2)
     {
-      Vector3f lIlluminationAxisVector = new Vector3f(-1, 0, 0);
-      Vector3f lIlluminationNormalVector = new Vector3f(0, 0, -1);
+      Vector3f lIlluminationAxisVector0 = new Vector3f(1, 0, 0);
+      Vector3f lIlluminationNormalVector0 = new Vector3f(0, 0, 1);
 
-      addLightSheet(lIlluminationAxisVector,
-                    lIlluminationNormalVector);
+      addLightSheet(lIlluminationAxisVector0,
+                    lIlluminationNormalVector0);
+
+      Vector3f lIlluminationAxisVector1 = new Vector3f(-1, 0, 0);
+      Vector3f lIlluminationNormalVector1 = new Vector3f(0, 0, -1);
+
+      addLightSheet(lIlluminationAxisVector1,
+                    lIlluminationNormalVector1);
+    }
+    else if (pNumberOfIlluminationArms == 4)
+    {
+      double gammazero = toRadians(30);
+      float ax = (float) cos(gammazero);
+      float ay = (float) sin(gammazero);
+
+      Vector3f lIlluminationAxisVector0 = new Vector3f(ax, ay, 0);
+      Vector3f lIlluminationAxisVector1 = new Vector3f(ax, -ay, 0);
+      Vector3f lIlluminationAxisVector2 = new Vector3f(-ax, ay, 0);
+      Vector3f lIlluminationAxisVector3 = new Vector3f(-ax, -ay, 0);
+      Vector3f lIlluminationNormalVector01 = new Vector3f(0, 0, 1);
+      Vector3f lIlluminationNormalVector23 = new Vector3f(0, 0, -1);
+
+      addLightSheet(lIlluminationAxisVector0,
+                    lIlluminationNormalVector01);
+
+      addLightSheet(lIlluminationAxisVector1,
+                    lIlluminationNormalVector01);
+
+      addLightSheet(lIlluminationAxisVector2,
+                    lIlluminationNormalVector23);
+
+      addLightSheet(lIlluminationAxisVector3,
+                    lIlluminationNormalVector23);
+
     }
 
     int lMaxCameraImageWidth = pMaxCameraResolution;
@@ -100,7 +137,14 @@ public class LightSheetMicroscopeSimulatorOrtho extends
                        lMaxCameraImageHeight);
     }
 
-    buildMicroscope();
+    try
+    {
+      buildMicroscope();
+    }
+    catch (IOException e)
+    {
+      e.printStackTrace();
+    }
 
   }
 

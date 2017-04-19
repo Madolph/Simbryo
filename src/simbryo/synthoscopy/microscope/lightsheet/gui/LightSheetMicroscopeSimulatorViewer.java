@@ -1,4 +1,4 @@
-package simbryo.synthoscopy.microscope.lightsheet.gui.jfx;
+package simbryo.synthoscopy.microscope.lightsheet.gui;
 
 import java.util.concurrent.CountDownLatch;
 import javafx.application.Platform;

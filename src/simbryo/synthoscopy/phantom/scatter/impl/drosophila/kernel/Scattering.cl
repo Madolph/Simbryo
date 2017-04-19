@@ -5,12 +5,12 @@ __kernel void scatterrender(   __write_only    image3d_t  image,
                                         const  float      lowedge,
                                         const  float      highedge,
                                         const  float      noiseratio,
+                                        const  float      scattering_whole,
+                                        const  float      scattering_yolk,
                                         const  float      intensity,
                                         const  int        timeindex                         
                            )
 {
-  const sampler_t sampler = CLK_NORMALIZED_COORDS_TRUE | CLK_ADDRESS_MIRRORED_REPEAT | CLK_FILTER_NEAREST;
-
   
   const uint width  = get_image_width(image);
   const uint height = get_image_height(image);
@@ -38,9 +38,7 @@ __kernel void scatterrender(   __write_only    image3d_t  image,
   const float3 scaledcentnormpos = centnormpos*axis;
   const float distance = fast_length(scaledcentnormpos)-(ELLIPSOIDR);  
   const float insdistance = fmax(0.0f,-distance);
-  value +=  smoothstep(lowedge, highedge, insdistance);
-
-  value = clamp(intensity*value, 0.0f, 1.0f);
+  value += intensity*(scattering_whole*smoothstep(lowedge, highedge, insdistance) +scattering_yolk*native_powr(insdistance,0.5f));
   
   write_imagef (image, (int4){x,y,z,0}, value);
 }

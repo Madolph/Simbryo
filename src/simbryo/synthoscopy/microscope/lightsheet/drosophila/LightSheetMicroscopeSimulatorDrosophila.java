@@ -23,6 +23,8 @@ public class LightSheetMicroscopeSimulatorDrosophila extends
   private DrosophilaHistoneFluorescence mDrosophilaFluorescencePhantom;
   private DrosophilaScatteringPhantom mDrosophilaScatteringPhantom;
 
+  private volatile boolean mFreezedEmbryo = false;
+
   /**
    * Instanciates a light sheet microscope simulator with a simulated drosophila
    * embryo as sample
@@ -110,18 +112,12 @@ public class LightSheetMicroscopeSimulatorDrosophila extends
     return mDrosophilaScatteringPhantom.openViewer();
   }
 
-  /**
-   * Advance the drosophila embryo simulation by the given number and time
-   * duration of steps.
-   * 
-   * @param pNumberOfSteps
-   *          number of steps
-   * @param pDeltaTime
-   *          delta time for each step
-   */
-  public void simulationSteps(int pNumberOfSteps, float pDeltaTime)
+  @Override
+  public void simulationSteps(int pNumberOfSteps)
   {
-    mDrosophila.simulationSteps(pNumberOfSteps, pDeltaTime);
+    if (!isFreezedEmbryo())
+      mDrosophila.simulationSteps(pNumberOfSteps);
+    super.simulationSteps(pNumberOfSteps);
   }
 
   @Override
@@ -138,6 +134,28 @@ public class LightSheetMicroscopeSimulatorDrosophila extends
     super.close();
     mDrosophilaScatteringPhantom.close();
     mDrosophilaFluorescencePhantom.close();
+  }
+
+  /**
+   * Returns wether this embryo is 'frozen' - meaning that it is prevented from
+   * developping.
+   * 
+   * @return true -> frozen, false -> otherwise
+   */
+  public boolean isFreezedEmbryo()
+  {
+    return mFreezedEmbryo;
+  }
+
+  /**
+   * Sets whther this embryo should be 'frozen' - prevented from developping.
+   * 
+   * @param pFreezeEmbryo
+   *          true -> frozen, false -> otherwise
+   */
+  public void setFreezedEmbryo(boolean pFreezeEmbryo)
+  {
+    mFreezedEmbryo = pFreezeEmbryo;
   }
 
 }

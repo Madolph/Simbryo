@@ -2,6 +2,7 @@ package simbryo.dynamics.tissue;
 
 import java.io.Serializable;
 
+import simbryo.SimulationInterface;
 import simbryo.particles.ParticleSystemInterface;
 
 /**
@@ -12,14 +13,9 @@ import simbryo.particles.ParticleSystemInterface;
  */
 public interface TissueDynamicsInterface extends
                                          ParticleSystemInterface,
+                                         SimulationInterface,
                                          Serializable
 {
-
-  /**
-   * Returns the current time step index.
-   * 
-   * @return time step
-   */
-  long getTimeStepIndex();
+  // nothing _yet_
 
 }

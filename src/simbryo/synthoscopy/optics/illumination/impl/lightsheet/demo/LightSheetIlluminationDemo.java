@@ -62,7 +62,7 @@ public class LightSheetIlluminationDemo
 
         Drosophila lDrosophila = new Drosophila(16, lGridDimensions);
         // lDrosophila.open3DViewer();
-        lDrosophila.simulationSteps(1000, 1);
+        lDrosophila.simulationSteps(1000);
 
         DrosophilaHistoneFluorescence lDrosoFluo =
                                                  new DrosophilaHistoneFluorescence(lContext,

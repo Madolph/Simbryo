@@ -32,7 +32,7 @@ public class EmbryoDemo
     while (lOrganoid.getViewer().isShowing())
     {
       lTimming.syncAtPeriod(10);
-      lOrganoid.simulationSteps(1, 1);
+      lOrganoid.simulationSteps(1);
     }
 
     lOrganoid.getViewer().waitWhileShowing();
@@ -54,7 +54,7 @@ public class EmbryoDemo
     while (lSpheroid.getViewer().isShowing())
     {
       lTimming.syncAtPeriod(10);
-      lSpheroid.simulationSteps(1, 1);
+      lSpheroid.simulationSteps(1);
     }
 
     lSpheroid.getViewer().waitWhileShowing();
@@ -78,7 +78,7 @@ public class EmbryoDemo
     while (lDrosophila.getViewer().isShowing())
     {
       lTimming.syncAtPeriod(1);
-      lDrosophila.simulationSteps(1, 1);
+      lDrosophila.simulationSteps(1);
     }
 
     lDrosophila.getViewer().waitWhileShowing();

@@ -20,9 +20,8 @@ public abstract class IlluminationOpticsBase extends OpticsBase
   protected ClearCLImage mScatteringPhantomImage;
 
   /**
-   * Instanciates a ClearCL powered illumination optics base class given the
-   * wavelength of light, the light intensity, ClearCL context, and the light
-   * map image dimensions.
+   * Instanciates a ClearCL powered illumination optics base class given a
+   * ClearCL context, and the light map image dimensions.
    * 
    * @param pContext
    *          ClearCL context

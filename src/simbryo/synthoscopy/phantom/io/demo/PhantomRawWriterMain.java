@@ -95,7 +95,7 @@ public class PhantomRawWriterMain
 
       while (lDrosophila.getTimeStepIndex() < 15000)
       {
-        lDrosophila.simulationSteps(lPeriod, 1);
+        lDrosophila.simulationSteps(lPeriod);
         final long lTimeIndex = lDrosophila.getTimeStepIndex();
 
         lDrosoFluo.clear(true);

@@ -18,7 +18,7 @@ import clearcl.viewer.ClearCLImageViewer;
 import coremem.ContiguousMemoryInterface;
 import simbryo.synthoscopy.camera.impl.SCMOSCameraRenderer;
 import simbryo.synthoscopy.microscope.MicroscopeSimulatorBase;
-import simbryo.synthoscopy.microscope.lightsheet.gui.jfx.LightSheetMicroscopeSimulatorViewer;
+import simbryo.synthoscopy.microscope.lightsheet.gui.LightSheetMicroscopeSimulatorViewer;
 import simbryo.synthoscopy.microscope.parameters.CameraParameter;
 import simbryo.synthoscopy.microscope.parameters.DetectionParameter;
 import simbryo.synthoscopy.microscope.parameters.IlluminationParameter;
@@ -26,6 +26,7 @@ import simbryo.synthoscopy.microscope.parameters.PhantomParameter;
 import simbryo.synthoscopy.microscope.parameters.StageParameter;
 import simbryo.synthoscopy.microscope.parameters.UnitConversion;
 import simbryo.synthoscopy.optics.detection.impl.widefield.WideFieldDetectionOptics;
+import simbryo.synthoscopy.optics.illumination.combiner.IlluminationCombiner;
 import simbryo.synthoscopy.optics.illumination.impl.lightsheet.LightSheetIllumination;
 import simbryo.util.geom.GeometryUtils;
 
@@ -46,6 +47,8 @@ public class LightSheetMicroscopeSimulator extends
 
   private ArrayList<LightSheetIllumination> mLightSheetIlluminationList =
                                                                         new ArrayList<>();
+  private IlluminationCombiner<LightSheetIllumination> mIlluminationCombiner;
+
   private ArrayList<WideFieldDetectionOptics> mWideFieldDetectionOpticsList =
                                                                             new ArrayList<>();
   private ArrayList<SCMOSCameraRenderer> mCameraRendererList =
@@ -66,6 +69,7 @@ public class LightSheetMicroscopeSimulator extends
                                        long... pMainPhantomDimensions)
   {
     super(pContext, pMainPhantomDimensions);
+
   }
 
   @Override
@@ -134,15 +138,27 @@ public class LightSheetMicroscopeSimulator extends
 
   /**
    * Must be called after all lightsheets and detection arms have been added.
+   * 
+   * @throws IOException
+   *           thrown if problems while reading kernel sources
    */
   @Override
-  public void buildMicroscope()
+  public void buildMicroscope() throws IOException
   {
+    mIlluminationCombiner =
+                          new IlluminationCombiner<>(mContext,
+                                                     mLightSheetIlluminationList);
+
     for (LightSheetIllumination lLightSheetIllumination : mLightSheetIlluminationList)
-      for (WideFieldDetectionOptics lWideFieldDetectionOptics : mWideFieldDetectionOpticsList)
-      {
-        lLightSheetIllumination.addUpdateListener(lWideFieldDetectionOptics);
-      }
+    {
+      lLightSheetIllumination.addUpdateListener(mIlluminationCombiner);
+
+    }
+
+    for (WideFieldDetectionOptics lWideFieldDetectionOptics : mWideFieldDetectionOpticsList)
+    {
+      mIlluminationCombiner.addUpdateListener(lWideFieldDetectionOptics);
+    }
   }
 
   @Override
@@ -186,11 +202,11 @@ public class LightSheetMicroscopeSimulator extends
                                             int pDetectionPathIndex)
   {
     float lLengthConversionfactor =
-                                  getNumberParameter(UnitConversion.Length,
-                                                     0).floatValue();
+                                  getNumberParameterWithAberrations(UnitConversion.Length,
+                                                                    0).floatValue();
     float lLaserPowerConversionfactor =
-                                      getNumberParameter(UnitConversion.LaserIntensity,
-                                                         0).floatValue();
+                                      getNumberParameterWithAberrations(UnitConversion.LaserIntensity,
+                                                                        0).floatValue();
 
     LightSheetIllumination lLightSheetIllumination =
                                                    mLightSheetIlluminationList.get(pLightSheetIndex);
@@ -201,39 +217,44 @@ public class LightSheetMicroscopeSimulator extends
     lLightSheetIllumination.setScatteringPhantom(getPhantomParameter(PhantomParameter.Scattering));
 
     float lIntensity =
-                     getNumberParameter(IlluminationParameter.Intensity,
-                                        pLightSheetIndex).floatValue()
+                     getNumberParameterWithAberrations(IlluminationParameter.Intensity,
+                                                       pLightSheetIndex).floatValue()
                        / lLaserPowerConversionfactor;
 
     float lWaveLength =
-                      getNumberParameter(IlluminationParameter.Wavelength,
-                                         pLightSheetIndex).floatValue();
+                      getNumberParameterWithAberrations(IlluminationParameter.Wavelength,
+                                                        pLightSheetIndex).floatValue();
 
-    float xl = (getNumberParameter(IlluminationParameter.X,
-                                   pLightSheetIndex).floatValue()
-                / lLengthConversionfactor)
-               + 0.5f;
-    float yl = (getNumberParameter(IlluminationParameter.Y,
-                                   pLightSheetIndex).floatValue()
-                / lLengthConversionfactor)
-               + 0.5f;
-    float zl = (getNumberParameter(IlluminationParameter.Z,
-                                   pLightSheetIndex).floatValue()
-                / lLengthConversionfactor)
-               + 0.5f;
+    float xl =
+             (getNumberParameterWithAberrations(IlluminationParameter.X,
+                                                pLightSheetIndex).floatValue()
+              / lLengthConversionfactor) + 0.5f;
+    float yl =
+             (getNumberParameterWithAberrations(IlluminationParameter.Y,
+                                                pLightSheetIndex).floatValue()
+              / lLengthConversionfactor) + 0.5f;
+    float zl =
+             (getNumberParameterWithAberrations(IlluminationParameter.Z,
+                                                pLightSheetIndex).floatValue()
+              / lLengthConversionfactor) + 0.5f;
 
-    float height = getNumberParameter(IlluminationParameter.Height,
-                                      pLightSheetIndex).floatValue()
+    float height =
+                 getNumberParameterWithAberrations(IlluminationParameter.Height,
+                                                   pLightSheetIndex).floatValue()
                    / lLengthConversionfactor;
 
-    float alpha = getNumberParameter(IlluminationParameter.Alpha,
-                                     pLightSheetIndex).floatValue();
-    float beta = getNumberParameter(IlluminationParameter.Beta,
-                                    pLightSheetIndex).floatValue();
-    float gamma = getNumberParameter(IlluminationParameter.Gamma,
-                                     pLightSheetIndex).floatValue();
-    float theta = getNumberParameter(IlluminationParameter.Theta,
-                                     pLightSheetIndex).floatValue();
+    float alpha =
+                getNumberParameterWithAberrations(IlluminationParameter.Alpha,
+                                                  pLightSheetIndex).floatValue();
+    float beta =
+               getNumberParameterWithAberrations(IlluminationParameter.Beta,
+                                                 pLightSheetIndex).floatValue();
+    float gamma =
+                getNumberParameterWithAberrations(IlluminationParameter.Gamma,
+                                                  pLightSheetIndex).floatValue();
+    float theta =
+                getNumberParameterWithAberrations(IlluminationParameter.Theta,
+                                                  pLightSheetIndex).floatValue();
 
     lLightSheetIllumination.setIntensity(lIntensity);
     lLightSheetIllumination.setLightWavelength(lWaveLength);
@@ -250,8 +271,8 @@ public class LightSheetMicroscopeSimulator extends
                                                ClearCLImage pLightMapImage)
   {
     float lLengthConversionfactor =
-                                  getNumberParameter(UnitConversion.Length,
-                                                     0).floatValue();
+                                  getNumberParameterWithAberrations(UnitConversion.Length,
+                                                                    0).floatValue();
 
     WideFieldDetectionOptics lWideFieldDetectionOptics =
                                                        mWideFieldDetectionOpticsList.get(pDetectionPathIndex);
@@ -264,37 +285,37 @@ public class LightSheetMicroscopeSimulator extends
                                          getPhantomParameter(PhantomParameter.Scattering);
 
     float lIntensity =
-                     getNumberParameter(DetectionParameter.Intensity,
-                                        pDetectionPathIndex).floatValue();
+                     getNumberParameterWithAberrations(DetectionParameter.Intensity,
+                                                       pDetectionPathIndex).floatValue();
 
     float lWaveLength =
-                      getNumberParameter(DetectionParameter.Wavelength,
-                                         pDetectionPathIndex).floatValue();
+                      getNumberParameterWithAberrations(DetectionParameter.Wavelength,
+                                                        pDetectionPathIndex).floatValue();
 
-    float lFocusZ = (getNumberParameter(DetectionParameter.Z,
-                                        pDetectionPathIndex).floatValue()
-                     / lLengthConversionfactor)
-                    + 0.5f;
+    float lFocusZ =
+                  (getNumberParameterWithAberrations(DetectionParameter.Z,
+                                                     pDetectionPathIndex).floatValue()
+                   / lLengthConversionfactor) + 0.5f;
 
     long lDetectionImageWidth = lFluorescencePhantomImage.getWidth();
     long lDetectionImageHeight =
                                lFluorescencePhantomImage.getHeight();
 
     int lROIOffsetX =
-                    getNumberParameter(CameraParameter.ROIOffsetX,
-                                       pDetectionPathIndex).intValue();
+                    getNumberParameterWithAberrations(CameraParameter.ROIOffsetX,
+                                                      pDetectionPathIndex).intValue();
     int lROIOffsetY =
-                    getNumberParameter(CameraParameter.ROIOffsetY,
-                                       pDetectionPathIndex).intValue();
+                    getNumberParameterWithAberrations(CameraParameter.ROIOffsetY,
+                                                      pDetectionPathIndex).intValue();
 
     int lROIWidth =
-                  getNumberParameter(CameraParameter.ROIWidth,
-                                     pDetectionPathIndex,
-                                     lSCMOSCameraRenderer.getMaxWidth()).intValue();
+                  getNumberParameterWithAberrations(CameraParameter.ROIWidth,
+                                                    pDetectionPathIndex,
+                                                    lSCMOSCameraRenderer.getMaxWidth()).intValue();
     int lROIHeight =
-                   getNumberParameter(CameraParameter.ROIHeight,
-                                      pDetectionPathIndex,
-                                      lSCMOSCameraRenderer.getMaxHeight()).intValue();
+                   getNumberParameterWithAberrations(CameraParameter.ROIHeight,
+                                                     pDetectionPathIndex,
+                                                     lSCMOSCameraRenderer.getMaxHeight()).intValue();
 
     lWideFieldDetectionOptics.setFluorescencePhantomImage(lFluorescencePhantomImage);
     lWideFieldDetectionOptics.setScatteringPhantomImage(lScatteringPhantomImage);
@@ -308,7 +329,28 @@ public class LightSheetMicroscopeSimulator extends
 
     lWideFieldDetectionOptics.setPhantomTransformMatrix(getStageAndDetectionTransformMatrix(pDetectionPathIndex));
 
+    float lExposureInSeconds =
+                             getNumberParameterWithAberrations(CameraParameter.Exposure,
+                                                               pDetectionPathIndex).floatValue();
+
+    float lMagnification =
+                         getNumberParameterWithAberrations(CameraParameter.Magnification,
+                                                           pDetectionPathIndex).floatValue();
+
+    float lShiftX =
+                  getNumberParameterWithAberrations(CameraParameter.ShiftX,
+                                                    pDetectionPathIndex).floatValue();
+
+    float lShiftY =
+                  getNumberParameterWithAberrations(CameraParameter.ShiftY,
+                                                    pDetectionPathIndex).floatValue();
+
     lSCMOSCameraRenderer.setDetectionImage(lWideFieldDetectionOptics.getImage());
+    lSCMOSCameraRenderer.setExposure(lExposureInSeconds);
+
+    lSCMOSCameraRenderer.setMagnification(lMagnification);
+    lSCMOSCameraRenderer.setShiftX(lShiftX);
+    lSCMOSCameraRenderer.setShiftY(lShiftY);
 
     lSCMOSCameraRenderer.setCenteredROI(lROIOffsetX,
                                         lROIOffsetY,
@@ -338,26 +380,35 @@ public class LightSheetMicroscopeSimulator extends
                                   getNumberParameter(UnitConversion.Length,
                                                      0).floatValue();
 
-    float lStageX = getNumberParameter(StageParameter.StageX, 0, 0)
-                                                                   .floatValue()
+    float lStageX =
+                  getNumberParameterWithAberrations(StageParameter.StageX,
+                                                    0,
+                                                    0).floatValue()
                     / lLengthConversionfactor;
-    float lStageY = getNumberParameter(StageParameter.StageY, 0, 0)
-                                                                   .floatValue()
+    float lStageY =
+                  getNumberParameterWithAberrations(StageParameter.StageY,
+                                                    0,
+                                                    0).floatValue()
                     / lLengthConversionfactor;
-    float lStageZ = getNumberParameter(StageParameter.StageZ, 0, 0)
-                                                                   .floatValue()
+    float lStageZ =
+                  getNumberParameterWithAberrations(StageParameter.StageZ,
+                                                    0,
+                                                    0).floatValue()
                     / lLengthConversionfactor;
 
-    float lStageRX = getNumberParameter(StageParameter.StageRX,
-                                        0,
-                                        0).floatValue();
+    float lStageRX =
+                   getNumberParameterWithAberrations(StageParameter.StageRX,
+                                                     0,
+                                                     0).floatValue();
 
-    float lStageRY = getNumberParameter(StageParameter.StageRY,
-                                        0,
-                                        0).floatValue();
-    float lStageRZ = getNumberParameter(StageParameter.StageRZ,
-                                        0,
-                                        0).floatValue();
+    float lStageRY =
+                   getNumberParameterWithAberrations(StageParameter.StageRY,
+                                                     0,
+                                                     0).floatValue();
+    float lStageRZ =
+                   getNumberParameterWithAberrations(StageParameter.StageRZ,
+                                                     0,
+                                                     0).floatValue();
 
     Vector3f lCenter = new Vector3f(0.5f, 0.5f, 0.5f);
 
@@ -380,6 +431,33 @@ public class LightSheetMicroscopeSimulator extends
     return lMatrix;
   }
 
+  /**
+   * Returns pixel width (after converting into unnormalized spatial units using
+   * UnitConversion.Length)
+   * 
+   * @param pCameraIndex
+   *          camera index
+   * @return pixel width
+   */
+  public double getPixelWidth(int pCameraIndex)
+  {
+    float lLengthConversionfactor =
+                                  getNumberParameter(UnitConversion.Length,
+                                                     0).floatValue();
+
+    SCMOSCameraRenderer lCameraRenderer =
+                                        getCameraRenderer(pCameraIndex);
+
+    long lMaxWidth = lCameraRenderer.getMaxWidth();
+
+    double lNormalizedPixelWidth = 1.0 / lMaxWidth;
+
+    double lPixelWidth = lNormalizedPixelWidth
+                         * lLengthConversionfactor;
+
+    return lPixelWidth;
+  }
+
   @Override
   public void render(boolean pWaitToFinish)
   {
@@ -399,7 +477,6 @@ public class LightSheetMicroscopeSimulator extends
     SCMOSCameraRenderer lSCMOSCameraRenderer =
                                              mCameraRendererList.get(pDetectionIndex);
 
-    ClearCLImage lCurrentLightMap = null;
     int lNumberOfLightSheets = mLightSheetIlluminationList.size();
     for (int lLightSheetIndex =
                               0; lLightSheetIndex < lNumberOfLightSheets; lLightSheetIndex++)
@@ -407,16 +484,19 @@ public class LightSheetMicroscopeSimulator extends
       LightSheetIllumination lLightSheetIllumination =
                                                      mLightSheetIlluminationList.get(lLightSheetIndex);
       applyParametersForLightSheet(lLightSheetIndex, pDetectionIndex);
-      lLightSheetIllumination.setInputImage(lCurrentLightMap);
-      ElapsedTime.measure("renderlightsheet",
-                          () -> lLightSheetIllumination.render(false));
 
-      lCurrentLightMap = lLightSheetIllumination.getImage();
+      lLightSheetIllumination.requestUpdate();
+      ElapsedTime.measure("renderlightsheet",
+                          () -> lLightSheetIllumination.render(true));
 
     }
 
+    ElapsedTime.measure("rendercombinedlightsheet",
+                        () -> mIlluminationCombiner.render(true));
+    ClearCLImage lCombinedLightMap = mIlluminationCombiner.getImage();
+
     applyParametersForDetectionPath(pDetectionIndex,
-                                    lCurrentLightMap);
+                                    lCombinedLightMap);
 
     ElapsedTime.measure("renderdetection",
                         () -> lWideFieldDetectionOptics.render(false));
@@ -449,6 +529,14 @@ public class LightSheetMicroscopeSimulator extends
   public ClearCLImageViewer openViewerForLightMap(int pIndex)
   {
     return getLightSheet(pIndex).openViewer();
+  }
+
+  @Override
+  public void openViewerForAllLightMaps()
+  {
+    int lNumberOfLightSheets = getNumberOfLightSheets();
+    for (int l = 0; l < lNumberOfLightSheets; l++)
+      getLightSheet(l).openViewer();
   }
 
   @Override
