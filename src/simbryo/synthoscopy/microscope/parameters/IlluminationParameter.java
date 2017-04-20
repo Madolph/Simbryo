@@ -18,7 +18,7 @@ public enum IlluminationParameter implements
  Alpha(0.0f, -45, 45),
  Beta(0.0f, -45, 45),
  Gamma(0.0f, -45, 45),
- Theta(2.0f, 0, 20);
+ Theta(3.0f, 0, 20);
 
   Number mDefaultValue, mMinValue, mMaxValue;
 

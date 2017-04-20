@@ -293,10 +293,17 @@ public class LightSheetMicroscopeSimulator extends
                       getNumberParameterWithAberrations(DetectionParameter.Wavelength,
                                                         pDetectionPathIndex).floatValue();
 
-    float lFocusZ =
-                  (getNumberParameterWithAberrations(DetectionParameter.Z,
-                                                     pDetectionPathIndex).floatValue()
-                   / lLengthConversionfactor) + 0.5f;
+    Matrix4f lDetectionTransformMatrix =
+                                       getDetectionTransformMatrix(pDetectionPathIndex);
+
+    float lDetectionZSign =
+                          lDetectionTransformMatrix.getElement(0, 0);
+
+    float lFocusZ = (lDetectionZSign
+                     * getNumberParameterWithAberrations(DetectionParameter.Z,
+                                                         pDetectionPathIndex).floatValue()
+                     / lLengthConversionfactor)
+                    + 0.5f;
 
     long lDetectionImageWidth = lFluorescencePhantomImage.getWidth();
     long lDetectionImageHeight =

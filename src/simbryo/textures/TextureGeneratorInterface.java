@@ -48,7 +48,7 @@ public interface TextureGeneratorInterface extends Cloneable
    *          dimensions of textures
    * @return texture as array of floats
    */
-  float[] generateTexture(int... pDimensions);
+  float[] generateTexture(long... pDimensions);
 
   /**
    * Samples textures ata given coordinate

@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import simbryo.textures.noise.BSplineNoise;
 import simbryo.textures.noise.SimplexNoise;
+import simbryo.textures.noise.UniformNoise;
 
 /**
  * Noise Textures Demos
@@ -21,6 +22,43 @@ import simbryo.textures.noise.SimplexNoise;
  */
 public class NoiseDemos
 {
+
+  /**
+   * Simplex 3D noise demo
+   */
+  @Test
+  public void demoUniformNoise3D()
+  {
+    ClearCLBackendInterface lBestBackend =
+                                         ClearCLBackends.getBestBackend();
+    System.out.println("lBestBackend=" + lBestBackend);
+    try (ClearCL lClearCL = new ClearCL(lBestBackend))
+    {
+      ClearCLDevice lFastestGPUDevice =
+                                      lClearCL.getFastestGPUDeviceForImages();
+
+      ClearCLContext lContext = lFastestGPUDevice.createContext();
+
+      UniformNoise lUniformNoise = new UniformNoise(3);
+      lUniformNoise.setScale(0.1f, 0.1f, 0.1f);
+
+      float[] lTexture = lUniformNoise.generateTexture(128, 128, 128);
+
+      ClearCLImage lClearCLImage =
+                                 lContext.createSingleChannelImage(ImageChannelDataType.Float,
+                                                                   128,
+                                                                   128,
+                                                                   128);
+
+      lClearCLImage.readFrom(lTexture, true);
+
+      ClearCLImageViewer lView =
+                               ClearCLImageViewer.view(lClearCLImage);
+
+      lView.waitWhileShowing();
+
+    }
+  }
 
   /**
    * Simplex Noise 2D Demo
