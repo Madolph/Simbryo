@@ -392,11 +392,11 @@ public class SynthoscopySandBox
     Stackgenerator lStackgenerator = new Stackgenerator();
 
     for (int camera = 0; camera < 2; camera++)
-      lStackgenerator.generate_view(camera,
-                                    0,
-                                    64,
-                                    System.getProperty("user.home")
-                                        + "/Tmp/xscope");
+      lStackgenerator.generate_stack(camera,
+                                     0,
+                                     64,
+                                     System.getProperty("user.home")
+                                         + "/Tmp/xscope");
 
     // for(int camera=0; camera<2;camera++)
     // for(int sheet=0; sheet<4;sheet++)
@@ -405,6 +405,65 @@ public class SynthoscopySandBox
     // + "/Tmp/xscope");
     //
 
+  }
+
+  @Test
+  public void demo_single_plane() throws IOException,
+                                  InterruptedException
+  {
+
+    final float euler_x = 0.0f;
+    final float euler_y = 1.57f;
+    final float euler_z = 0.0f;
+
+    final float dx = 1.f / 1023;
+    final float translate_x = -0 * dx;
+    final float translate_y = 0 * 14 * dx;
+    final float translate_z = 0 * 2 * dx;
+
+    // build euler matrix
+    final Vector3f lCenter = new Vector3f(0.5f, 0.5f, 0.5f);
+
+    Matrix4f lMatrix = GeometryUtils.rotX(euler_x, lCenter);
+    lMatrix.mul(GeometryUtils.rotY(euler_y, lCenter), lMatrix);
+    lMatrix.mul(GeometryUtils.rotZ(euler_z, lCenter), lMatrix);
+
+    // Stackgenerator lStackgenerator = new Stackgenerator(lMatrix);
+    Stackgenerator lStackgenerator = new Stackgenerator();
+
+    lStackgenerator.generate_view(1, 0, -.1f, null);
+    lStackgenerator.generate_view(1, 0, 0.1f, null);
+  }
+
+  @Test
+  public void demo_single_stack() throws IOException,
+                                  InterruptedException
+  {
+
+    final float euler_x = 0.0f;
+    final float euler_y = 1.57f;
+    final float euler_z = 0.0f;
+
+    final float dx = 1.f / 1023;
+    final float translate_x = -0 * dx;
+    final float translate_y = 0 * 14 * dx;
+    final float translate_z = 0 * 2 * dx;
+
+    // build euler matrix
+    final Vector3f lCenter = new Vector3f(0.5f, 0.5f, 0.5f);
+
+    Matrix4f lMatrix = GeometryUtils.rotX(euler_x, lCenter);
+    lMatrix.mul(GeometryUtils.rotY(euler_y, lCenter), lMatrix);
+    lMatrix.mul(GeometryUtils.rotZ(euler_z, lCenter), lMatrix);
+
+    // Stackgenerator lStackgenerator = new Stackgenerator(lMatrix);
+    Stackgenerator lStackgenerator = new Stackgenerator();
+
+    lStackgenerator.generate_stack(1,
+                                   0,
+                                   64,
+                                   System.getProperty("user.home")
+                                       + "/Tmp/xscope");
   }
 
 }

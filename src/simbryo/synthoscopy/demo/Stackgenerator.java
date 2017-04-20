@@ -112,10 +112,10 @@ public class Stackgenerator
 
   }
 
-  public void generate_view(final int camera,
-                            final int lightsheet,
-                            final int n_planes,
-                            final String outdir) throws IOException
+  public void generate_stack(final int camera,
+                             final int lightsheet,
+                             final int n_planes,
+                             final String outdir) throws IOException
   {
 
     boolean lWriteFile = (outdir != null);
@@ -160,7 +160,7 @@ public class Stackgenerator
         lSimulator.setNumberParameter(IlluminationParameter.Z, i, z);
 
       lSimulator.setNumberParameter(DetectionParameter.Z, 0, z);
-      lSimulator.setNumberParameter(DetectionParameter.Z, 1, -z);
+      lSimulator.setNumberParameter(DetectionParameter.Z, 1, z);
 
       lDrosophilaFluorescencePhantom.render(false);
 
@@ -182,6 +182,69 @@ public class Stackgenerator
       }
     }
 
+  }
+
+  public void generate_view(final int camera,
+                            final int lightsheet,
+                            final float z,
+                            final String outdir) throws IOException
+  {
+
+    boolean lWriteFile = (outdir != null);
+
+    System.out.format("lightsheet =  %d, camera = %d, outdir = %s",
+                      lightsheet,
+                      camera,
+                      outdir);
+
+    RawWriter lRawWriter = new RawWriter();
+    lRawWriter.setOverwrite(true);
+    File lDesktopFolder = null;
+    if (lWriteFile)
+    {
+      lDesktopFolder = new File(outdir);
+      lDesktopFolder.mkdirs();
+    }
+
+    for (int i = 0; i < 4; i++)
+    {
+      lSimulator.setNumberParameter(IlluminationParameter.Height,
+                                    i,
+                                    1.2f);
+      lSimulator.setNumberParameter(IlluminationParameter.Intensity,
+                                    i,
+                                    0.f);
+
+    }
+
+    lSimulator.setNumberParameter(IlluminationParameter.Intensity,
+                                  lightsheet,
+                                  5.f);
+
+    for (int i = 0; i < 4; i++)
+      lSimulator.setNumberParameter(IlluminationParameter.Z, i, z);
+
+    lSimulator.setNumberParameter(DetectionParameter.Z, 0, z);
+    lSimulator.setNumberParameter(DetectionParameter.Z, 1, -z);
+
+    lDrosophilaFluorescencePhantom.render(false);
+
+    lSimulator.render(true);
+
+    if (lWriteFile)
+    {
+      File lRawFile = new File(lDesktopFolder,
+                               String.format("slice_%01d_%01d_%01d_%01d_%04f.raw",
+                                             lMaxCameraResolution,
+                                             lMaxCameraResolution,
+                                             camera,
+                                             lightsheet,
+                                             z)); // lDrosophila.getTimeStepIndex()
+      lRawWriter.setOverwrite(true);
+
+      // System.out.println("Writing: " + lRawFile);
+      lRawWriter.write(lSimulator.getCameraImage(camera), lRawFile);
+    }
   }
 
   @Override

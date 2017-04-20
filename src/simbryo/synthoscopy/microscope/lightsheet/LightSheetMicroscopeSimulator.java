@@ -109,6 +109,7 @@ public class LightSheetMicroscopeSimulator extends
                                int pMaxCameraWidth,
                                int pMaxCameraHeight)
   {
+
     try
     {
       mDetectionTransformationMatrixMap.put(mWideFieldDetectionOpticsList.size(),
@@ -364,6 +365,7 @@ public class LightSheetMicroscopeSimulator extends
     Matrix4f lCombinedTransformMatrix =
                                       GeometryUtils.multiply(getStageTransformMatrix(),
                                                              getDetectionTransformMatrix(pDetectionPathIndex));
+
     return lCombinedTransformMatrix;
   }
 

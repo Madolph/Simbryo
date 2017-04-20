@@ -74,6 +74,14 @@ __kernel void collectsingle(   __read_only    image3d_t  fluophantom,
   const float nx = ((float)x+0.5f)/width;
   const float ny = ((float)y+0.5f)/height;
 
+  if ((x==0)&(y==0)){
+	//printf("\nhuhu: %f %f %f %f\n",matrix[0],matrix[1],matrix[2],matrix[3]);
+	//printf("xxxx: %f %f %f %f\n",matrix[4],matrix[5],matrix[6],matrix[7]);
+	//printf("xxxx: %f %f %f %f\n",matrix[8],matrix[9],matrix[10],matrix[11]);
+	//printf("xxxx: %f %f %f %f\n",matrix[12],matrix[13],matrix[14],matrix[15]);
+	//printf("\nimfdepth: %f  z = %f \n", ifmdepth,z);
+	}
+	
   const float oldvalue    = read_imagef(imagein, intsampler, (int2){x,y}).x;
   const float fluovalue   = trans_read_imagef(fluophantom, normsampler,  matrix16, (float4){nx,ny,z+0.5f*ifmdepth,0.0f}).x;
   const float lightvalue  = read_imagef(lightmap,    normsampler, (float4){nx,ny,z+0.5f*ilmdepth,0.0f}).x;

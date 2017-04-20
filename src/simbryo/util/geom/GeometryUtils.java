@@ -212,6 +212,44 @@ public class GeometryUtils
   }
 
   /**
+   * Returns a 4D scaling matrix .
+   */
+  public static Matrix4f scale(final Vector3f pScale)
+  {
+
+    Matrix4f lScaleMatrix = new Matrix4f();
+
+    lScaleMatrix.setIdentity();
+    lScaleMatrix.m00 = pScale.x;
+    lScaleMatrix.m11 = pScale.y;
+    lScaleMatrix.m22 = pScale.z;
+
+    return lScaleMatrix;
+
+  }
+
+  public static Matrix4f scale(final Vector3f pScale,
+                               final Vector3f pCenter)
+  {
+
+    Matrix4f lScaleMatrix = scale(pScale);
+    Matrix4f lTranslationMatrix = new Matrix4f();
+    lTranslationMatrix.setIdentity();
+    lTranslationMatrix.setTranslation(pCenter);
+    Matrix4f lTranslationMatrixInverse =
+                                       new Matrix4f(lTranslationMatrix);
+    lTranslationMatrixInverse.invert();
+
+    Matrix4f lfinal =
+                    multiply(lTranslationMatrix,
+                             lScaleMatrix,
+                             lTranslationMatrixInverse);
+
+    return lfinal;
+
+  }
+
+  /**
    * Returns a rotation matrix around a new rotation center
    * 
    * @param pRotationMatrix

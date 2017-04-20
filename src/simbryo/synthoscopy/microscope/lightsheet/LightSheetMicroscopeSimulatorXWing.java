@@ -72,6 +72,9 @@ public class LightSheetMicroscopeSimulatorXWing extends
                                                                  0.5f,
                                                                  0.5f));
 
+    // lDetectionMatrix1 = GeometryUtils.multiply(lDetectionMatrix1,
+    // GeometryUtils.scale(new Vector3f(1, 1, -1),new Vector3f(.5f, .5f, .5f)));
+
     lDetectionMatrix1 = GeometryUtils.multiply(pMisalignmentCamera,
                                                lDetectionMatrix1);
 
