@@ -81,6 +81,10 @@ __kernel void hisrender(   __write_only    image3d_t  image,
   value += autofluo(dim, voxelpos, sampler, perlin, timeindex);
   value += NOISERATIO*rngfloat3(x+timeindex,y+timeindex,z+timeindex);    
   
+  
+  value = 1000.f*(fabs(1.f*x-200)<10)*(fabs(1.f*y-220)<10)*(fabs(1.f*z-200)<10);
+  
+  
   if(localneighboors[0]<0)
   {
     write_imagef (image, (int4){x,y,z,0.0f}, intensity*value);
@@ -124,6 +128,7 @@ __kernel void hisrender(   __write_only    image3d_t  image,
     }
   }
     
+  
   write_imagef (image, (int4){x,y,z,0}, intensity*value);
 
 }
