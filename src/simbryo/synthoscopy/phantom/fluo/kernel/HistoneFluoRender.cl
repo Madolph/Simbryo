@@ -82,7 +82,7 @@ __kernel void hisrender(   __write_only    image3d_t  image,
   value += NOISERATIO*rngfloat3(x+timeindex,y+timeindex,z+timeindex);    
   
   
-  value = 1000.f*(fabs(1.f*x-200)<10)*(fabs(1.f*y-220)<10)*(fabs(1.f*z-200)<10);
+  value = 10.f*(fabs(1.f*x-200)<10)*(fabs(1.f*y-220)<10)*(fabs(1.f*z-200)<10);
   
   
   if(localneighboors[0]<0)

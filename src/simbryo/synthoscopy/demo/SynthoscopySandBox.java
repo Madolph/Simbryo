@@ -396,7 +396,8 @@ public class SynthoscopySandBox
                                      0,
                                      64,
                                      System.getProperty("user.home")
-                                         + "/Tmp/xscope");
+                                         + String.format("/Temp/xscope/%d",
+                                                         camera));
 
     // for(int camera=0; camera<2;camera++)
     // for(int sheet=0; sheet<4;sheet++)
