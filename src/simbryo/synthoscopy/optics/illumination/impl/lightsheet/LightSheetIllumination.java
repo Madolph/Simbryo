@@ -1,6 +1,7 @@
 package simbryo.synthoscopy.optics.illumination.impl.lightsheet;
 
 import static java.lang.Math.max;
+import static java.lang.Math.sin;
 import static java.lang.Math.toRadians;
 
 import java.io.IOException;
@@ -16,6 +17,7 @@ import clearcl.ClearCLKernel;
 import clearcl.ClearCLProgram;
 import clearcl.enums.ImageChannelDataType;
 import clearcl.util.MatrixUtils;
+import simbryo.synthoscopy.microscope.parameters.IlluminationParameter;
 import simbryo.synthoscopy.optics.illumination.IlluminationOpticsBase;
 import simbryo.synthoscopy.optics.illumination.IlluminationOpticsInterface;
 import simbryo.util.geom.GeometryUtils;
@@ -64,8 +66,10 @@ public class LightSheetIllumination extends IlluminationOpticsBase
   {
     super(pContext, pLightMapDimensions);
 
-    setLightSheetThetaInDeg(2);
-    setLightSheetHeigth(0.5f);
+    setLightSheetThetaInDeg(IlluminationParameter.Theta.getDefaultValue()
+                                                       .floatValue());
+    setLightSheetHeigth(IlluminationParameter.Height.getDefaultValue()
+                                                    .floatValue());
     setScatterConstant(100.0f);
     setScatterLoss(0.02f);
     setSigmaMin(0.5f);
@@ -719,9 +723,17 @@ public class LightSheetIllumination extends IlluminationOpticsBase
                                      GeometryUtils.directionMultiplication(lVectorTransformationMatrix,
                                                                            mLightSheetNormalVector);
 
+    // the following two lines make sure that the lighsheet alpha pivot also
+    // affects the z position:
+    mLightSheetEffectivePosition.set(mLightSheetPosition);
+    mLightSheetEffectivePosition.z = (float) (mLightSheetPosition.z
+                                              + sin(mLightSheetAlphaInRad)
+                                                * (mLightSheetPosition.y
+                                                   - 0.5f));
+
     mLightSheetEffectivePosition =
                                  GeometryUtils.pointMultiplication(lInverseDetectionTransformMatrix,
-                                                                   mLightSheetPosition);
+                                                                   mLightSheetEffectivePosition);
 
   }
 

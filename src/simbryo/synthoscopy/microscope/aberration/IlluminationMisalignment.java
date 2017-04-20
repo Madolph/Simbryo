@@ -53,7 +53,7 @@ public class IlluminationMisalignment extends AberrationBase
     {
       float lOffsetConstant = adjustOffsetAmount(pParameter);
 
-      lOffset = mOffsetConstant * lOffsetConstant * rand(-1, 1);
+      lOffset = mOffsetConstant * lOffsetConstant; // * rand(-1, 1);
 
       mOffsetMap.put(lKey, lOffset);
     }
@@ -72,13 +72,13 @@ public class IlluminationMisalignment extends AberrationBase
     switch ((IlluminationParameter) pParameter)
     {
     case Alpha:
-      lOffsetConstant = 1;
+      lOffsetConstant = 5;
       break;
     case Beta:
-      lOffsetConstant = 1;
+      lOffsetConstant = 0;
       break;
     case Gamma:
-      lOffsetConstant = 1;
+      lOffsetConstant = 0;
       break;
     case Height:
       lOffsetConstant = 1;

@@ -1,5 +1,7 @@
 package simbryo.textures;
 
+import static java.lang.Math.toIntExact;
+
 /**
  * This base class implements common functionality required by all texture
  * generators
@@ -11,6 +13,7 @@ public abstract class TextureGeneratorBase implements
 {
   private int mDimension;
   private float[] mScale;
+  private volatile boolean mNormalizedTexture = true;
 
   /**
    * Instantiates a texture generator with given dimension.
@@ -31,6 +34,27 @@ public abstract class TextureGeneratorBase implements
 
   @Override
   public abstract TextureGeneratorInterface clone();
+
+  /**
+   * Returns whetehr this generates normalized textures (true) or not (false)
+   * 
+   * @return is-normalized flag
+   */
+  public boolean isNormalizedTexture()
+  {
+    return mNormalizedTexture;
+  }
+
+  /**
+   * Sets whether this texture should be normalized between 0 and 1
+   * 
+   * @param pNormalizedTexture
+   *          true -> normalized texture
+   */
+  public void setNormalizeTexture(boolean pNormalizedTexture)
+  {
+    mNormalizedTexture = pNormalizedTexture;
+  }
 
   /**
    * Returns scales for all dimensions.
@@ -85,7 +109,7 @@ public abstract class TextureGeneratorBase implements
    *          dimensions
    * @return volume
    */
-  protected int getVolume(int[] pDimensions)
+  protected int getVolume(long... pDimensions)
   {
     long lVolume = 1;
 
@@ -99,9 +123,9 @@ public abstract class TextureGeneratorBase implements
   public abstract float sampleTexture(int... pCoordinate);
 
   @Override
-  public float[] generateTexture(int... pDimensions)
+  public float[] generateTexture(long... pDimensions)
   {
-    float[] mArray = new float[getVolume(pDimensions)];
+    float[] mArray = new float[toIntExact(getVolume(pDimensions))];
 
     if (pDimensions.length == 1)
     {
@@ -152,6 +176,9 @@ public abstract class TextureGeneratorBase implements
 
   private float[] normalize(float[] pTextureArray)
   {
+    if (!isNormalizedTexture())
+      return pTextureArray;
+
     final int length = pTextureArray.length;
 
     float lMin = Float.POSITIVE_INFINITY,
